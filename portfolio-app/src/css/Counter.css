@@ -1,0 +1,10 @@
+.counter-container {
+  width: min(1000px, 100%);
+  box-sizing: border-box;
+}
+.button-group {
+  display: flex;
+  flex-wrap: wrap;          /* allows wrapping on small screens */
+  justify-content: center;  /* keeps them centered */
+  gap: 10px;
+}
