@@ -1,224 +1,495 @@
 # Test Plan: Counter and Task Manager
 
-This is my plan for testing two parts of my portfolio app. Both of them show up on the Home page.
+## Project Overview
 
-| Part | File | What I will test |
+The application being tested is a React portfolio application originally developed for AD312. It demonstrates React development concepts, including component state management, user interactions, form validation, data persistence, and asynchronous updates.
+
+This test plan focuses on two components located on the Home page.
+
+| Component | File | Testing Types |
 |---|---|---|
-| Counter | `src/components/Counter.tsx` | Static testing and white box testing |
-| Task Manager | `src/components/TaskManager.tsx` (it also uses `src/hooks/useLocalStorage.ts`) | Black box testing |
+| Counter | `src/components/Counter.tsx` | Static and white-box testing |
+| Task Manager | `src/components/TaskManager.tsx` | Static, black-box, and white-box testing |
+| Local Storage Hook | `src/hooks/useLocalStorage.ts` | Static and white-box testing |
 
-Defect management and AI-assisted testing are used for both parts.
+Defect management and AI-assisted testing will be used throughout the testing process.
+
+### Team Responsibilities
+
+| Activity | Assigned To |
+|---|---|
+| Initial test plan | Cole |
+| Test plan review | Both |
+| Static testing | Cole |
+| Black-box testing | Copper |
+| White-box testing | Copper |
+| Initial defect reporting | Cole |
+| Defect corrections | Copper |
+| Confirmation testing | Copper |
+| Regression testing | Copper |
+| AI-assisted testing | Both |
+| Final documentation review | Both |
+| Presentation and demonstration | Both |
 
 ## 1. Test Objectives
 
-What I want to find out from testing:
-
-- Check that every button on the Counter does what it should: Increment, Increment Twice, Increment with Delay, Correct Increment Twice, and Reset.
-- Find out why Increment Twice and Increment with Delay don't always add the right amount. They use `count` directly instead of `prevCount`, and I want to prove that Correct Increment Twice fixes this.
-- Look for messy or risky code in Counter without running it.
-- Make sure my tests run every line and every function in Counter.
-- Check that Task Manager lets a user add tasks, mark them done, and still have them after the page reloads.
-- See what Task Manager does with weird input like an empty task or a super long task.
-- Write down every bug I find in the same way every time.
-- See if AI can help me come up with tests, and make sure I still check its work.
+- Verify that each Counter button performs its intended behavior.
+- Verify that the Counter correctly demonstrates the differences between direct and functional React state updates.
+- Identify unintended defects, risky code, and opportunities for improvement through static testing.
+- Verify that the Task Manager allows users to add tasks and toggle their completion status.
+- Verify that tasks and their completion statuses persist after the page reloads.
+- Evaluate how the Task Manager handles valid, invalid, and unexpected inputs.
+- Achieve meaningful statement, branch, function, and iteration coverage within the selected components.
+- Identify, document, correct, and retest genuine application defects.
+- Use AI-assisted testing to improve test design, code review, and defect documentation while independently verifying its recommendations.
 
 ## 2. Scope
 
-### What is in scope
-- Counter: how it looks when it loads, all five buttons, the count going up and resetting, the 2 second delay, and the CSS class names on the buttons.
-- Task Manager: the list of tasks, the text box, the Add button, the Toggle button, the "Done" / "Not Done" label, and saving tasks in `localStorage` under the name `tasks`.
-- Checking `Counter.tsx` with ESLint and TypeScript.
+### In Scope
 
-### What is out of scope
-- Static and white box testing for Task Manager. I only test it as a black box.
-- Black box testing for Counter, except what I need to help the white box tests.
-- All the other components, the other pages, routing, and the json-server API.
-- Speed tests, heavy load tests, and security tests.
-- The inside of React itself.
+**Counter**
+- Initial counter value.
+- Increment button.
+- Increment Twice button.
+- Correct Increment Twice button.
+- Increment with Delay button.
+- Reset button.
+- Asynchronous state updates.
+- Intentional demonstrations of incorrect React state handling.
+- Source-code quality and maintainability.
+
+**Task Manager**
+- Initial task list.
+- Adding tasks.
+- Task input validation.
+- Toggling task completion.
+- Managing multiple tasks.
+- Handling duplicate task titles.
+- Displaying special characters and long task titles.
+- Task persistence after refreshing or reopening the application.
+- Handling unexpected or corrupted saved data.
+- Basic responsive behavior and keyboard interactions.
+
+**Local Storage Hook**
+- Initialization with and without existing saved data.
+- Reading and writing saved data.
+- Handling invalid saved data.
+
+### Out of Scope
+
+- Other portfolio components and pages.
+- Application routing.
+- JSON Server API.
+- Comprehensive performance and load testing.
+- Comprehensive security testing.
+- Internal implementation of React and third-party libraries.
+- Correcting intentionally incorrect code used for educational demonstrations.
+
+### Expected Behavior
+
+The following expected behaviors will be reviewed and agreed upon by both team members before testing begins.
+
+| Feature | Expected Behavior |
+|---|---|
+| Counter initialization | Counter starts at 0 |
+| Increment | Increases the counter by 1 |
+| Increment Twice | Increases the counter by 1 as an intentional demonstration of incorrect React state handling |
+| Correct Increment Twice | Increases the counter by 2 |
+| Increment with Delay | Increases the counter by 1 after two seconds when tested independently |
+| Reset | Returns the counter to 0 |
+| Valid task input | Adds a new task with a status of Not Done |
+| Empty or whitespace-only task input | Does not add a task |
+| Duplicate task titles | Tasks are allowed and can be managed independently |
+| Task completion | Toggle changes only the selected task's completion status |
+| Task persistence | Tasks and completion statuses remain after reloading |
+| Invalid saved data | Application handles invalid data without crashing |
+
+The expected behavior of delayed updates combined with other Counter actions will be reviewed to determine whether the behavior is intentional or unintended.
+
+Intentional educational behavior will be documented but will not be classified as a defect.
 
 ## 3. Test Environment and Tools
 
-| Thing | Details |
+| Requirement | Details |
 |---|---|
-| Computer | Mac (macOS) |
-| Software | Node.js (current LTS version) and npm |
-| App is built with | React 19, TypeScript, and Vite |
-| Browsers for black box | Chrome (main one), Firefox, and Safari (newest versions) |
-| Static checking | ESLint (`npm run lint`) and TypeScript (`tsc -b`) |
-| White box tools | Vitest, React Testing Library, user-event, Vitest fake timers, and v8 coverage (I still need to install these) |
-| Black box tools | Testing by hand in the browser, using DevTools (Application tab) to see `localStorage`. Maybe a Playwright script later |
-| Bug tracking | GitHub Issues |
-| AI tools | Kiro and an AI chat assistant |
+| Operating systems | macOS and Windows |
+| Software | Node.js and npm |
+| Application technologies | React, TypeScript, and Vite |
+| Browsers | Chrome, Firefox, and Safari where available |
+| Static testing tools | Manual code review, ESLint, and TypeScript |
+| White-box testing tools | Vitest, React Testing Library, user-event, jsdom, fake timers, and V8 coverage |
+| Black-box testing tools | Manual browser testing and browser DevTools |
+| Defect tracking | GitHub Issues |
+| Version control | Git and GitHub |
+| AI tools | Kiro and ChatGPT |
 
-How I set things up:
-- Clear `localStorage` before every Task Manager test so the list starts empty.
-- Start the app with `npm run dev`.
-- Use fake timers in the white box tests so I don't have to really wait 2 seconds each time.
+### Environment Setup
+
+- Navigate to the `portfolio-app` directory.
+- Install application dependencies using `npm install`.
+- Start the application using `npm run dev`.
+- Install and configure the required automated testing libraries.
+- Clear relevant Task Manager localStorage data before independent tests.
+- Use fake timers when testing delayed Counter updates.
+- Record the operating system, browser, and application version or commit used during testing.
 
 ## 4. Test Approach
 
-I will test in this order:
+Testing will be completed using the following approaches.
 
-1. **Static testing** of Counter first, before running anything.
-2. **White box testing** of Counter. I can see the code, so I write tests that make sure every line and function runs.
-3. **Black box testing** of Task Manager. I pretend I don't know the code and only use what I can see on the screen: the text box, the buttons, and the list.
-4. **Defect management** for every problem I find.
-5. **AI-assisted testing** to get extra test ideas, and then I check them myself.
+| Testing Activity | Approach | Assigned To |
+|---|---|---|
+| Static testing | Manual source-code review and automated static analysis | Cole |
+| Black-box testing | Equivalence partitioning, state transition testing, and exploratory testing | Copper |
+| White-box testing | Automated statement, branch, function, and iteration testing | Copper |
+| Defect management | Document and prioritize discovered defects | Cole |
+| Defect correction | Modify application code to resolve confirmed defects | Copper |
+| Confirmation testing | Repeat tests related to corrected defects | Copper |
+| Regression testing | Repeat relevant tests to verify existing functionality | Copper |
+| AI-assisted testing | Use focused prompts to support testing activities | Both |
 
-When a bug gets fixed I test it again. Then I run all the tests again to make sure the fix didn't break something else.
+Testing activities may occur in parallel. Findings will be communicated between both team members throughout the project.
+
+When a defect is identified, it will be documented before changes are made to the application. After the correction is completed, confirmation testing and regression testing will be performed.
 
 ## 5. Risks
 
-| Risk | How likely | How bad | What I will do about it |
+| Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| The "Increment Twice" and "Increment with Delay" buttons might be on purpose to show a React problem (the Increment Twice button is even marked with a warning). Someone might call them bugs by mistake. | High | Medium | Write down what is supposed to happen: Increment Twice adds 1, and Correct Increment Twice adds 2. Mark it as "known behavior" if it is a teaching demo. |
-| I haven't installed a test tool yet | High | Medium | Install Vitest and Testing Library before starting white box tests. |
-| The 2 second delay test might not work the same every time | Medium | Medium | Use fake timers in the automatic tests. For hand tests, use a stopwatch and allow about half a second either way. |
-| Task Manager has no written rules, so I'm not sure what should happen with empty or repeated tasks | High | Medium | Decide the right answers before testing and write them in the test cases. |
-| Old data in `localStorage` can mess up the next test | Medium | Medium | Clear it before each test. |
-| `useLocalStorage` uses `JSON.parse` with no protection, so bad saved data could crash the page | Medium | High | Add a test where I change the saved `tasks` data to something broken. |
-| Task ids come from `Date.now()`, so two tasks added at the same exact millisecond could get the same id | Low | Medium | Add a test where I click Add really fast. |
-| AI might write tests that are wrong or that just copy what the code does now | Medium | High | Read every AI test and compare it to what the app should do. |
-| Not enough time | Medium | Medium | Test the most important stuff first (state updates, saving, empty input). |
+| Intentional Counter behavior is incorrectly classified as a defect | High | Medium | Document the educational purpose and expected behavior before testing |
+| Automated testing tools are not yet configured | High | Medium | Install and configure the testing environment before executing automated tests |
+| Delayed Counter tests produce inconsistent results | Medium | Medium | Use fake timers for automated testing |
+| Task Manager has incomplete documented input requirements | High | Medium | Agree on expected behavior before executing tests |
+| Existing localStorage data interferes with test results | Medium | Medium | Reset relevant saved data between independent tests |
+| Invalid saved data causes the application to crash | Medium | High | Test corrupted localStorage data and document confirmed failures |
+| Tasks receive duplicate identifiers | Low | Medium | Verify that tasks can be managed independently when added rapidly |
+| Application changes introduce additional defects | Medium | High | Perform confirmation and regression testing after corrections |
+| AI-generated tests contain incorrect assumptions | Medium | High | Independently review and verify AI-generated recommendations |
+| Limited time prevents completion of testing | Medium | Medium | Prioritize required testing techniques and core functionality |
+| Concurrent changes create merge conflicts | Medium | Medium | Communicate changes and use separate branches and pull requests |
 
 ## 6. Entry and Exit Criteria
 
-### Entry criteria (what must be true before I start)
-- `npm install` and `npm run build` finish with no errors.
-- The app runs with `npm run dev` and the Home page shows Counter and Task Manager.
-- The test tools for white box testing are installed.
-- I wrote down what each Counter button and each Task Manager action should do.
-- The test cases are written and checked.
+### Entry Criteria
 
-### Exit criteria (what must be true before I'm done)
-- Every planned test case has been run and the results are written down.
-- ESLint and `tsc` show no errors for `Counter.tsx`, or I explain each leftover warning.
-- Counter has 100% statement coverage and 100% function coverage, and every branch that exists is covered.
-- No critical or high bugs are still open.
-- Any medium or low bugs left open are written down and accepted.
-- The re-run of all tests passes.
-- The test summary report is finished.
+- The application is available in the shared GitHub repository.
+- Application dependencies are installed.
+- The application can run in the local development environment.
+- The selected components are accessible.
+- Required testing tools are installed and configured before their respective testing activities.
+- Expected application behaviors are documented and reviewed.
+- Test cases are prepared before execution.
+- Team responsibilities are assigned.
+
+Existing build or static analysis errors will be documented rather than preventing static testing from beginning.
+
+### Exit Criteria
+
+- Manual and automated static testing are completed.
+- At least two black-box testing techniques are applied.
+- At least six black-box test cases are executed and documented.
+- At least four automated white-box test cases are executed and documented.
+- Statement and branch testing are completed, including iteration testing where applicable.
+- A code coverage report is generated.
+- At least two defect reports are completed.
+- Corrected defects have been retested.
+- Regression testing is completed.
+- No unresolved critical or high-severity defects remain without documented justification.
+- At least three focused uses of AI-assisted testing are documented.
+- All required testing documentation is committed to the shared repository.
+- Both team members have contributed commits and pull requests.
+- The final test summary, presentation, and partner contribution summary are completed.
 
 ## 7. Test Deliverables
 
-### 7.1 Static Testing (Counter)
+### 7.1 Static Testing
 
-**What I will do:**
-- Run `npm run lint` and `tsc -b` and write down what they say about `Counter.tsx`.
-- Read through the code with this checklist:
-  - When the new count depends on the old count, does the code use `setCount(prev => prev + 1)`?
-  - `incrementTwice` calls `setCount(count + 1)` two times. React batches them, and both use the same `count`, so it only goes up by 1.
-  - `incrementDelay` remembers `count` from when the button was clicked. If you click it and then click Increment during the 2 seconds, one of the updates is lost.
-  - Does the timer get cleared if the component goes away? (`incrementDelay` never saves or clears its timer.)
-  - Are the handler names and button labels clear and matching?
-  - Is the `warning-btn` class actually in the CSS file that gets imported?
-  - Is the code style consistent? (Some lines have semicolons and some don't.)
-  - Can a screen reader tell when the count changes? (There is no `aria-live` area.)
-  - Are both `App.css` and `Counter.css` needed?
+**Assigned to: Cole**
 
-**What I will hand in:**
-- The ESLint and `tsc` results for `Counter.tsx`.
-- The finished checklist with what I found and how serious each thing is.
-- A list of which problems got fixed and which were left for later.
+Manual and automated static testing will be performed on the selected source-code files.
 
-### 7.2 Black Box Testing (Task Manager)
+#### Manual Review
 
-**Ways I will test:** equivalence partitioning (grouping similar inputs), boundary value analysis (testing the edges), state transition testing, and exploratory testing (just trying things out).
+The review will evaluate:
 
-**Planned test cases:**
+- Correct use of React state updates.
+- Intentional and unintentional incorrect behavior.
+- Asynchronous timer management.
+- Task input validation.
+- Task identifier generation.
+- Handling of invalid localStorage data.
+- Code readability and consistency.
+- Accessibility of interactive components.
+- Error handling.
 
-| ID | What I'm testing | Steps | What should happen |
+Intentional examples of incorrect React state handling will be documented separately from genuine defects.
+
+#### Automated Static Analysis
+
+The following commands will be used from the `portfolio-app` directory:
+
+- `npm run lint`
+- `npx tsc -b`
+
+Results relating to the selected components will be documented. Findings outside the testing scope may be noted separately.
+
+#### Deliverables
+
+- Manual code review checklist.
+- Automated static analysis results.
+- Identified findings and recommended corrections.
+- Severity and final status of confirmed defects.
+- Evidence of corrections made.
+- Updated analysis results following corrections.
+
+### 7.2 Black-Box Testing
+
+**Assigned to: Copper**
+
+Black-box testing will focus on the Task Manager's observable behavior without relying on its internal implementation to determine expected results.
+
+The primary techniques will be:
+
+- Equivalence partitioning.
+- State transition testing.
+
+Exploratory testing will also be used to evaluate additional application behaviors.
+
+#### Equivalence Partitioning
+
+| Classification | Partition | Expected Result |
+|---|---|---|
+| Task input | Valid, non-empty title | Task is added |
+| Task input | Empty title | Task is not added |
+| Task input | Whitespace-only title | Task is not added |
+| Task input | Special characters | Task is displayed as text |
+| Task title duplication | Unique title | Task is added |
+| Task title duplication | Duplicate title | Task is added and managed independently |
+
+#### State Transition Testing
+
+| Current State | Action | Expected State |
+|---|---|---|
+| No task | Add valid task | Not Done |
+| No task | Add invalid task | No task |
+| Not Done | Toggle | Done |
+| Done | Toggle | Not Done |
+| Not Done | Reload application | Not Done |
+| Done | Reload application | Done |
+
+#### Planned Test Cases
+
+| ID | Test Scenario | Expected Result |
+|---|---|---|
+| TM-01 | Load Task Manager without saved tasks | Task list is empty |
+| TM-02 | Add a normal task | Task appears as Not Done and input clears |
+| TM-03 | Add three different tasks | All three tasks appear |
+| TM-04 | Toggle an incomplete task | Status changes to Done |
+| TM-05 | Toggle a completed task | Status changes to Not Done |
+| TM-06 | Toggle one of three tasks | Only the selected task changes |
+| TM-07 | Add an empty task | No task is added |
+| TM-08 | Add a whitespace-only task | No task is added |
+| TM-09 | Add a 500-character task title | Task is displayed without making the interface unusable |
+| TM-10 | Add special characters and HTML-like text | Input is displayed as text |
+| TM-11 | Add the same title twice | Both tasks appear and can be managed independently |
+| TM-12 | Add tasks, toggle one, and reload | Tasks and statuses persist |
+| TM-13 | Close and reopen the application at the same URL | Tasks and statuses persist |
+| TM-14 | Load with corrupted saved task data | Application handles invalid data without crashing |
+| TM-15 | Enter a task and press Enter | Observe and document keyboard behavior |
+| TM-16 | Rapidly add multiple valid tasks | Tasks are created as independent entries |
+| TM-17 | Test different screen sizes | Task Manager remains usable |
+| TM-18 | Navigate and operate controls using the keyboard | Input and buttons remain accessible |
+
+TM-15 will be treated as an exploratory scenario unless a specific keyboard submission requirement is established.
+
+#### Deliverables
+
+- Equivalence partition tables.
+- State transition table.
+- Test cases with steps, expected results, actual results, and pass or fail status.
+- Exploratory testing notes.
+- Evidence of failed tests.
+- Confirmation testing results following corrections.
+
+### 7.3 White-Box Testing
+
+**Assigned to: Copper**
+
+Automated white-box testing will focus on Counter, Task Manager, and the localStorage hook.
+
+Tests will be created using Vitest and React Testing Library based on the internal implementation of the selected components.
+
+#### Testing Techniques
+
+| Technique | Application |
+|---|---|
+| Statement testing | Execute statements within the selected components and hook |
+| Branch testing | Test conditional outcomes in Task Manager and the localStorage hook |
+| Iteration testing | Test task-list operations with zero, one, and multiple tasks |
+| Function testing | Execute Counter and Task Manager event handlers |
+| Asynchronous testing | Verify delayed Counter updates using fake timers |
+
+#### Planned Counter Test Cases
+
+| ID | Test Scenario | Expected Result |
+|---|---|---|
+| CW-01 | Initial render | Counter displays 0 |
+| CW-02 | Increment once | Counter displays 1 |
+| CW-03 | Increment three times | Counter displays 3 |
+| CW-04 | Click Increment Twice | Counter displays 1 as intentionally demonstrated |
+| CW-05 | Click Correct Increment Twice | Counter displays 2 |
+| CW-06 | Click Increment with Delay | Counter remains unchanged immediately |
+| CW-07 | Advance timer by 2000 ms | Counter increases by 1 |
+| CW-08 | Advance timer by 1999 ms | Counter remains unchanged |
+| CW-09 | Increment during a pending delayed update | Document behavior and compare against agreed expectations |
+| CW-10 | Reset a non-zero counter | Counter displays 0 |
+| CW-11 | Reset a counter already at 0 | Counter remains at 0 |
+| CW-12 | Execute multiple different Counter actions | Counter reflects the expected sequence |
+| CW-13 | Unmount with a pending delayed update | No unintended errors or effects occur |
+
+#### Planned Task Manager and Local Storage Test Cases
+
+| ID | Test Scenario | Technique | Expected Result |
 |---|---|---|---|
-| TM-01 | Starting screen | Clear `localStorage`, load Home | The "Tasks" heading shows and the list is empty |
-| TM-02 | Add a normal task | Type "Buy milk", click Add | The task shows up as "Not Done" and the text box clears |
-| TM-03 | Add a few tasks | Add three tasks | All three show in the order I added them |
-| TM-04 | Mark as done | Click Toggle on a task | The label changes to "Done" and the text looks completed |
-| TM-05 | Undo done | Click Toggle again | The label goes back to "Not Done" |
-| TM-06 | Toggle just one | Toggle the second of three tasks | Only that task changes |
-| TM-07 | Empty text box | Click Add with nothing typed | A task should NOT be added (I need to confirm this, because the code looks like it adds a blank one) |
-| TM-08 | Only spaces | Type three spaces, click Add | A task should NOT be added (confirm) |
-| TM-09 | Really long title | Add a title with 500 characters | The task is added and the page layout doesn't break |
-| TM-10 | Special characters | Add `<b>test</b>` and `"quotes" & symbols` | The text shows exactly as typed, not as HTML |
-| TM-11 | Same title twice | Add "Task" two times | Both show up and each can be toggled by itself |
-| TM-12 | Saving | Add two tasks, toggle one, reload the page | The tasks and their done status are still there |
-| TM-13 | Saving after closing | Do TM-12, but close the tab and open it again | Same as TM-12 |
-| TM-14 | Broken saved data | Change `tasks` in `localStorage` to `{bad`, reload | The page shouldn't crash (confirm) |
-| TM-15 | Enter key | Type a task and press Enter | Write down whether it adds the task (the code only has a click handler) |
-| TM-16 | Clicking fast | Click Add quickly many times with text in the box | Each task is added one time with its own entry |
-| TM-17 | Different screen sizes | Look at 375, 768, and 1280 px wide | The list, text box, and buttons still work |
-| TM-18 | Keyboard only | Use Tab to move through the box and buttons and press Space | I can reach everything and it works |
+| TW-01 | Initialize without saved tasks | Branch | Empty task list is displayed |
+| TW-02 | Initialize with saved tasks | Branch | Saved tasks are restored |
+| TW-03 | Add a valid task | Statement | Task is added |
+| TW-04 | Add an invalid task | Statement / Branch | Task is rejected |
+| TW-05 | Toggle a task with multiple tasks present | Branch | Matching task changes and other tasks remain unchanged |
+| TW-06 | Render zero tasks | Iteration | No task entries are rendered |
+| TW-07 | Render one task | Iteration | One task entry is rendered |
+| TW-08 | Render multiple tasks | Iteration | All task entries are rendered |
+| TW-09 | Update task completion | Statement | Updated task data is saved |
+| TW-10 | Initialize with malformed saved data | Error handling | Invalid data is handled without crashing |
 
-**What I will hand in:**
-- The test case document (this table, plus the actual results and pass or fail).
-- A log of each run with the date, browser, and who tested.
-- Notes from my exploratory testing.
-- Screenshots for any test that fails.
+#### Coverage Goals
 
-### 7.3 White Box Testing (Counter)
+| Coverage Type | Target |
+|---|---|
+| Statement coverage | 94% or higher |
+| Line coverage | 94% or higher |
+| Function coverage | 100% |
+| Branch coverage | 100% of applicable branches where feasible |
+| Iteration testing | Zero, one, and multiple iterations where applicable |
 
-**Ways I will test:** statement coverage, function coverage, and checking how state updates work. I will write unit tests with Vitest and React Testing Library.
+Coverage goals apply to the selected source-code files rather than the entire portfolio application. Any unmet targets will be documented and explained.
 
-**Planned test cases:**
+#### Deliverables
 
-| ID | What I'm testing | Test | What should happen |
-|---|---|---|---|
-| CW-01 | First render | Render `<Counter />` | The heading says "Counter: 0" and there are five buttons |
-| CW-02 | `increment` | Click Increment one time | Count is 1 |
-| CW-03 | `increment` | Click Increment three times | Count is 3 |
-| CW-04 | `incrementTwice` | Click Increment Twice starting at 0 | Count is 1 (not 2) because both calls use the same `count` |
-| CW-05 | `incrementTwiceCorrectly` | Click Correct Increment Twice starting at 0 | Count is 2 |
-| CW-06 | `incrementDelay` | Click Increment with Delay and check right away | Count is still 0 |
-| CW-07 | `incrementDelay` | Click it, then move the fake timers forward 2000 ms | Count is 1 |
-| CW-08 | `incrementDelay` | Click it, then move the timers forward only 1999 ms | Count is still 0 (edge case) |
-| CW-09 | `incrementDelay` old value problem | Click Increment with Delay, then click Increment, then move timers forward 2000 ms | Count is 1 (not 2) because the delayed update uses the old `count` |
-| CW-10 | `reset` | Increment up to 3, then click Reset | Count is 0 |
-| CW-11 | `reset` | Click Reset when it's already 0 | Count stays 0 |
-| CW-12 | Mixed buttons | Increment, Correct Increment Twice, Reset, Increment | Count is 1 |
-| CW-13 | Unmounting | Click Increment with Delay, remove the component, move timers forward | No error happens |
-
-**Coverage goals:** 100% statements, 100% functions, and 100% lines for `Counter.tsx`. The component has no if-statements, so branch coverage is 100% as long as every handler runs.
-
-**What I will hand in:**
-- The automatic test file (for example `src/components/Counter.test.tsx`) saved in the project.
-- The coverage report (HTML and a text summary).
-- A written explanation of the results of the old-value tests (CW-04 and CW-09).
+- Automated test files.
+- Automated test execution results.
+- Code coverage report.
+- Explanation of statement, branch, and iteration testing.
+- Documentation of failed tests.
+- Confirmation and regression testing results.
 
 ### 7.4 Defect Management
 
-**How it works:** Log it, triage it (decide how bad it is), assign it, fix it, retest it, and close it. Every bug from static, white box, and black box testing goes into GitHub Issues.
+**Initial defect reporting: Cole**
 
-**What each bug report needs:** ID, title, which part it's in, test case ID, description, steps to make it happen, what should happen, what really happened, severity, priority, environment (browser and version), screenshot or log, status, and owner.
+**Defect corrections and retesting: Copper**
 
-| Severity | What it means |
+Genuine defects discovered during static, black-box, and white-box testing will be documented using GitHub Issues.
+
+Intentional educational examples will not be reported as defects unless their behavior differs from their documented educational purpose.
+
+Potential areas for defect investigation include:
+
+- Empty or whitespace-only tasks being accepted.
+- Invalid localStorage data causing application crashes.
+- Duplicate task identifiers causing incorrect task updates.
+- Unintended asynchronous state updates.
+- Input handling and display issues.
+
+These are potential findings and will only be classified as confirmed defects after review or testing.
+
+#### Defect Report Requirements
+
+Each defect report will include:
+
+- Defect ID and title.
+- Related test case or static review.
+- Test environment.
+- Steps to reproduce or source-code location.
+- Expected result.
+- Actual result.
+- Severity.
+- Priority.
+- Assigned owner.
+- Supporting evidence.
+- Current status.
+
+#### Severity Classification
+
+| Severity | Description |
 |---|---|
-| Critical | The page crashes or data is lost, and there is no way around it |
-| High | A main feature doesn't work and it's hard to get around |
-| Medium | A feature only partly works, but there is a way around it |
-| Low | Small or looks-only problem |
+| Critical | Application crashes or significant data loss occurs without a reasonable workaround |
+| High | A core application feature does not function correctly |
+| Medium | A feature functions incorrectly but remains partially usable or has a workaround |
+| Low | Minor visual, usability, or non-critical issue |
 
-**Statuses:** New, Open, In Progress, Fixed, Retest, Closed, Reopened, Deferred.
+#### Priority Classification
 
-**What I will hand in:**
-- The bug list in GitHub Issues.
-- A bug summary report with counts by severity, status, part of the app, and kind of test (static, white box, black box).
-- Retest and re-run results for every bug that gets fixed.
+| Priority | Description |
+|---|---|
+| High | Correction should be completed before project completion |
+| Medium | Correction should be completed when resources allow |
+| Low | Correction may be deferred with documentation |
+
+#### Defect Workflow
+
+1. Identify and reproduce the defect.
+2. Cole creates the initial defect report.
+3. Review and assign severity and priority.
+4. Assign the defect to Copper.
+5. Copper implements the correction.
+6. Perform confirmation testing.
+7. Perform regression testing.
+8. Close or reopen the defect based on the results.
+
+At least two defect reports will be completed. Genuine defects will be prioritized. If insufficient genuine defects are discovered, a controlled defect may be introduced and documented as an intentionally seeded defect in accordance with the instructor's guidance.
+
+#### Deliverables
+
+- At least two completed defect reports.
+- Supporting screenshots, logs, or code references.
+- Evidence of corrections.
+- Confirmation testing results.
+- Regression testing results.
+- Final defect statuses.
 
 ### 7.5 AI-Assisted Testing
 
-**How I will use AI:**
-- Give the AI the Counter code and ask for edge cases and Vitest tests, then compare them with CW-01 to CW-13.
-- Describe what Task Manager looks like and does (without showing the code) and ask for black box test cases, then compare them with TM-01 to TM-18.
-- Ask the AI to review `Counter.tsx` for old-value and cleanup problems, then compare that with my own static review.
-- Ask the AI to turn my rough notes into clear bug reports.
+**Assigned to: Both**
 
-**Rules I will follow:**
-- I read, run, and fix every AI test before I save it in the project.
-- I check each test against what the app is supposed to do, not just what the code does now. For example, if the AI writes a test that says Increment Twice reaches 2, the test will fail, and I need to figure out why instead of just changing it to pass.
-- Mutation check: I will change the code on purpose (like changing `+ 1` to `+ 2`) and make sure the AI tests fail.
-- I won't share passwords or personal info with AI tools.
+AI tools will be used to support testing activities throughout the project.
 
-**What I will hand in:**
-- A log of my prompts and the answers, marked as accepted, edited, or rejected.
-- The AI-assisted tests, labeled so people know they came from AI.
-- A comparison of AI-assisted and hand testing: how many good test cases, bugs found, wrong suggestions, and time spent.
-- A short reflection on what AI is good at, where it falls short, and what I recommend.
+Planned uses include:
+
+| AI-Assisted Activity | Purpose |
+|---|---|
+| Static code review | Identify potential code-quality issues and unintended behavior |
+| Black-box test design | Identify equivalence partitions, state transitions, and unexpected inputs |
+| White-box test design | Identify statements, branches, iteration scenarios, and coverage gaps |
+| Defect documentation | Improve the clarity and completeness of defect reports |
+
+All AI-generated recommendations will be independently reviewed and verified before being used.
+
+AI will not be used to generate or fabricate actual test results.
+
+For each documented AI interaction, the following information will be recorded:
+
+- Complete prompt.
+- Testing activity supported.
+- Context provided to the AI.
+- How the response was used.
+- Recommendations accepted, revised, or rejected.
+
+#### Deliverables
+
+- At least three focused AI-assisted testing interactions.
+- Complete prompts and relevant responses.
+- Explanation of how AI recommendations were verified.
+- Documentation of accepted, revised, and rejected recommendations.
+
+**This document was edited for clarity and formating with the use of AI**
